@@ -1,30 +1,163 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="container p-3">
+    <div class="row d-none">
+      <div class="col-12">
+        <h1 class="h3">Block creator for {{ childrens }} elements</h1>
+        <div class="d-flex">
+          <div class="form-floating">
+            <input
+              type="number"
+              step="1"
+              min="1"
+              v-model="levels"
+              class="form-control form-control-sm"
+              id="levels"
+            />
+            <label for="levels"><small>Количество уровней</small></label>
+          </div>
+
+          <div class="form-floating ms-2">
+            <input
+              type="number"
+              step="1"
+              min="1"
+              v-model="childrens"
+              class="form-control form-control-sm"
+              id="childrens"
+            />
+            <label for="childrens"><small>Количество детей</small></label>
+          </div>
+
+          <div class="form-floating ms-2">
+            <input
+              type="number"
+              step="1"
+              min="1"
+              v-model="currentLevel"
+              class="form-control form-control-sm"
+              id="currentLevel"
+              disabled
+            />
+            <label for="currentLevel"><small>Текущий уровень</small></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <button class="btn btn-light" @click="addChild">+ Add child</button>
+        <span class="ms-2">{{ 'ID: ' + currentItemId }}</span>
+      </div>
+    </div>
+
+    <div v-if="arrayForShow.length" class="row">
+      <div class="col-12">
+        <div
+          v-if="arrayForShow.length < 4"
+          class="block border border-warning rounded bg-warning mt-3 p-2"
+        >
+          <h4>
+            {{ arrayForShow.title }}
+            <button
+              class="btn btn-light border rounded-0 flex-fill"
+              @click="currentLevel--"
+            >
+              -1
+            </button>
+          </h4>
+          <div class="d-flex">
+            <button
+              v-for="element in arrayForShow"
+              :key="element"
+              class="btn btn-light border rounded-0 flex-fill"
+              @click="currentItemId = element.id"
+            >
+              {{ element.title }}
+            </button>
+          </div>
+        </div>
+
+        <!-- For > 4  -->
+        <div v-else class="block border rounded mt-3 p-2">
+          <h4>
+            {{ array[currentLevel - 1].title }}
+            <button
+              class="btn btn-light border rounded-0 flex-fill"
+              @click="currentLevel--"
+            >
+              -1
+            </button>
+          </h4>
+          <div class="d-flex">
+            <button
+              v-for="element in array[currentLevel - 1].childrens.slice(
+                0,
+                array[currentLevel - 1].childrens.length / 2
+              )"
+              :key="element"
+              class="btn btn-light border rounded-0 flex-fill"
+              @click="currentLevel++"
+            >
+              {{ element.title }}
+            </button>
+          </div>
+
+          <div class="d-flex">
+            <button
+              v-for="element in array[currentLevel - 1].childrens.slice(
+                array[currentLevel - 1].childrens.length / 2
+              )"
+              :key="element"
+              class="btn btn-light border rounded-0 flex-fill"
+              @click="currentLevel++"
+            >
+              {{ element.title }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <pre>{{ array }}</pre>
+      </div>
+    </div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<script>
+export default {
+  data() {
+    return {
+      currentItemId: '',
+      currentLevel: 1,
+      array: [],
+    };
+  },
+  computed: {
+    arrayForShow() {
+      if (this.currentItemId) {
+        return this.array.find((item) => item.id === this.currentItemId)
+          .childrens;
+      }
+      return this.array;
+    },
+  },
+  methods: {
+    addChild() {
+      if (this.currentItemId) {
+        // Нужно найти вершину с этим ID и ей сделать push
+      }
+      this.array.push(this.createChild());
+    },
+    createChild() {
+      return {
+        id: String(Date.now()),
+        title: `${this.currentLevel} level`,
+        childrens: [],
+      };
+    },
+  },
+};
+</script>
