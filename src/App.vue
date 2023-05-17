@@ -120,7 +120,7 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <pre>{{ array }}</pre>
+        <pre>{{ arrayForShow }}</pre>
       </div>
     </div>
   </div>
@@ -148,6 +148,7 @@ export default {
     addChild() {
       if (this.currentItemId) {
         // Нужно найти вершину с этим ID и ей сделать push
+        this.arrayForShow.push(this.createChild());
       }
       this.array.push(this.createChild());
     },
@@ -161,7 +162,7 @@ export default {
     },
 
     getChildArray(array, parentId) {
-      return array.filter((item) => item.id === parentId).childrens;
+      return array.find((item) => item.id === parentId).childrens;
     },
   },
 };
