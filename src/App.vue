@@ -138,8 +138,8 @@ export default {
   computed: {
     arrayForShow() {
       if (this.currentItemId) {
-        return this.array.find((item) => item.id === this.currentItemId)
-          .childrens;
+        let tempArray = JSON.parse(JSON.stringify(this.arrayForShow));
+        return this.getChildArray(tempArray, this.currentItemId);
       }
       return this.array;
     },
@@ -151,12 +151,17 @@ export default {
       }
       this.array.push(this.createChild());
     },
+
     createChild() {
       return {
         id: String(Date.now()),
         title: `${this.currentLevel} level`,
         childrens: [],
       };
+    },
+
+    getChildArray(array, parentId) {
+      return array.filter((item) => item.id === parentId).childrens;
     },
   },
 };
