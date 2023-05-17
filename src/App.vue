@@ -57,15 +57,6 @@
           v-if="arrayForShow.length < 4"
           class="block border border-warning rounded bg-warning mt-3 p-2"
         >
-          <h4>
-            {{ arrayForShow.title }}
-            <button
-              class="btn btn-light border rounded-0 flex-fill"
-              @click="currentLevel--"
-            >
-              -1
-            </button>
-          </h4>
           <div class="d-flex">
             <button
               v-for="element in arrayForShow"
@@ -79,7 +70,7 @@
         </div>
 
         <!-- For > 4  -->
-        <div v-else class="block border rounded mt-3 p-2">
+        <!-- <div v-else class="block border rounded mt-3 p-2">
           <h4>
             {{ array[currentLevel - 1].title }}
             <button
@@ -115,12 +106,13 @@
               {{ element.title }}
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="row">
       <div class="col-12">
         <pre>{{ arrayForShow }}</pre>
+        <pre>temp: {{ tempArray }}</pre>
       </div>
     </div>
   </div>
@@ -132,25 +124,49 @@ export default {
     return {
       currentItemId: '',
       currentLevel: 1,
-      array: [],
+      tempArray: [],
     };
   },
   computed: {
+    // arrayForShow() {
+    //   if (this.currentItemId) {
+    //     let tempArray = JSON.parse(JSON.stringify(this.arrayForShow));
+    //     return this.getChildArray(tempArray, this.currentItemId);
+    //   }
+    //   return this.array;
+    // },
     arrayForShow() {
       if (this.currentItemId) {
-        let tempArray = JSON.parse(JSON.stringify(this.arrayForShow));
-        return this.getChildArray(tempArray, this.currentItemId);
+        const el = this.tempArray.find(
+          (item) => item.id === this.currentItemId
+        );
+        if (el) {
+          console.log('el find = ', el);
+          this.tempArray = el.childrens;
+          return this.tempArray;
+        }
+        console.log('el NOT find = ', el);
+        return [];
       }
-      return this.array;
+      return this.tempArray;
     },
   },
   methods: {
+    // getArrayForShow() {
+    //   if (this.currentItemId) {
+    //     let tempArray = JSON.parse(JSON.stringify(this.arrayForShow));
+    //     this.arrayForShow = this.getChildArray(tempArray, this.currentItemId);
+    //     return this.arrayForShow;
+    //   }
+    //   return this.arrayForShow;
+    // },
+
     addChild() {
       if (this.currentItemId) {
-        // Нужно найти вершину с этим ID и ей сделать push
-        this.arrayForShow.push(this.createChild());
+        this.tempArray = [];
+        this.tempArray.push(this.createChild());
       }
-      this.array.push(this.createChild());
+      this.tempArray.push(this.createChild());
     },
 
     createChild() {
@@ -162,6 +178,8 @@ export default {
     },
 
     getChildArray(array, parentId) {
+      console.log('array = ', array);
+      console.log('parentId = ', parentId);
       return array.find((item) => item.id === parentId).childrens;
     },
   },
