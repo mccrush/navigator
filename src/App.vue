@@ -1,10 +1,10 @@
 <template>
   <div class="container p-3">
-    <div class="row d-none">
+    <div class="row">
       <div class="col-12">
-        <h1 class="h3">Block creator for {{ childrens }} elements</h1>
+        <h1 class="h3">Навигатор по дереву</h1>
         <div class="d-flex">
-          <div class="form-floating">
+          <!-- <div class="form-floating">
             <input
               type="number"
               step="1"
@@ -14,9 +14,9 @@
               id="levels"
             />
             <label for="levels"><small>Количество уровней</small></label>
-          </div>
+          </div> -->
 
-          <div class="form-floating ms-2">
+          <!-- <div class="form-floating ms-2">
             <input
               type="number"
               step="1"
@@ -26,7 +26,7 @@
               id="childrens"
             />
             <label for="childrens"><small>Количество детей</small></label>
-          </div>
+          </div> -->
 
           <div class="form-floating ms-2">
             <input
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-2">
       <div class="col-12">
         <button class="btn btn-light" @click="addChild">+ Add child</button>
         <span class="ms-2">{{ 'ID: ' + currentItemId }}</span>
@@ -111,8 +111,8 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <pre>{{ arrayForShow }}</pre>
-        <pre>temp: {{ tempArray }}</pre>
+        <pre>arrayForShow: {{ arrayForShow }}</pre>
+        <pre>startArray: {{ startArray }}</pre>
       </div>
     </div>
   </div>
@@ -124,50 +124,68 @@ export default {
     return {
       currentItemId: '',
       currentLevel: 1,
-      tempArray: [],
+      startArray: [],
     };
   },
   computed: {
+    arrayForShow() {
+      if (this.currentItemId) {
+        return [];
+      }
+      return this.startArray;
+    },
     // arrayForShow() {
     //   if (this.currentItemId) {
-    //     let tempArray = JSON.parse(JSON.stringify(this.arrayForShow));
-    //     return this.getChildArray(tempArray, this.currentItemId);
+    //     let startArray = JSON.parse(JSON.stringify(this.arrayForShow));
+    //     return this.getChildArray(startArray, this.currentItemId);
     //   }
     //   return this.array;
     // },
-    arrayForShow() {
-      if (this.currentItemId) {
-        const el = this.tempArray.find(
-          (item) => item.id === this.currentItemId
-        );
-        if (el) {
-          console.log('el find = ', el);
-          this.tempArray = el.childrens;
-          return this.tempArray;
-        }
-        console.log('el NOT find = ', el);
-        return [];
-      }
-      return this.tempArray;
-    },
+
+    // arrayForShow() {
+    //   if (this.currentItemId) {
+    //     const el = this.startArray.find(
+    //       (item) => item.id === this.currentItemId
+    //     );
+    //     if (el) {
+    //       console.log('el find = ', el);
+    //       this.startArray = el.childrens;
+    //       return this.startArray;
+    //     }
+    //     console.log('el NOT find = ', el);
+    //     return [];
+    //   }
+    //   return this.startArray;
+    // },
   },
   methods: {
+    findItem(array, CII) {
+      if (array.length) {
+        const item = array.find((el) => el.id === CII);
+        if (item) {
+          return item;
+        } else {
+          array.forEach((el) => this.findItem(el.childrens, CII));
+        }
+      }
+      return false;
+    },
     // getArrayForShow() {
     //   if (this.currentItemId) {
-    //     let tempArray = JSON.parse(JSON.stringify(this.arrayForShow));
-    //     this.arrayForShow = this.getChildArray(tempArray, this.currentItemId);
+    //     let startArray = JSON.parse(JSON.stringify(this.arrayForShow));
+    //     this.arrayForShow = this.getChildArray(startArray, this.currentItemId);
     //     return this.arrayForShow;
     //   }
     //   return this.arrayForShow;
     // },
 
-    addChild() {
-      if (this.currentItemId) {
-        this.tempArray = [];
-        this.tempArray.push(this.createChild());
-      }
-      this.tempArray.push(this.createChild());
-    },
+    // addChild() {
+    //   if (this.currentItemId) {
+    //     this.startArray = [];
+    //     this.startArray.push(this.createChild());
+    //   }
+    //   this.startArray.push(this.createChild());
+    // },
 
     createChild() {
       return {
@@ -177,11 +195,11 @@ export default {
       };
     },
 
-    getChildArray(array, parentId) {
-      console.log('array = ', array);
-      console.log('parentId = ', parentId);
-      return array.find((item) => item.id === parentId).childrens;
-    },
+    // getChildArray(array, parentId) {
+    //   console.log('array = ', array);
+    //   console.log('parentId = ', parentId);
+    //   return array.find((item) => item.id === parentId).childrens;
+    // },
   },
 };
 </script>
