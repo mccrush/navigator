@@ -62,7 +62,7 @@
               v-for="element in arrayForShow"
               :key="element"
               class="btn btn-light border rounded-0 flex-fill"
-              @click="currentItemId = element.id"
+              @click="setCurrentItemId(element.id)"
             >
               {{ element.title }}
             </button>
@@ -130,62 +130,53 @@ export default {
   computed: {
     arrayForShow() {
       if (this.currentItemId) {
-        return [];
+        //const array = JSON.parse(JSON.stringify(this.startArray));
+        const item = this.findItem(this.startArray, this.currentItemId);
+        return item ? item.childrens : [];
       }
       return this.startArray;
     },
-    // arrayForShow() {
-    //   if (this.currentItemId) {
-    //     let startArray = JSON.parse(JSON.stringify(this.arrayForShow));
-    //     return this.getChildArray(startArray, this.currentItemId);
-    //   }
-    //   return this.array;
-    // },
-
-    // arrayForShow() {
-    //   if (this.currentItemId) {
-    //     const el = this.startArray.find(
-    //       (item) => item.id === this.currentItemId
-    //     );
-    //     if (el) {
-    //       console.log('el find = ', el);
-    //       this.startArray = el.childrens;
-    //       return this.startArray;
-    //     }
-    //     console.log('el NOT find = ', el);
-    //     return [];
-    //   }
-    //   return this.startArray;
-    // },
   },
   methods: {
     findItem(array, CII) {
-      if (array.length) {
-        const item = array.find((el) => el.id === CII);
-        if (item) {
-          return item;
+      return new Promise(function (resolve, reject) {
+        console.log('findItem() array for find item = ', array);
+        if (array.length) {
+          const item = array.find((el) => el.id === CII);
+          if (item) {
+            console.log('findItem() find item = ', item);
+            //return item;
+            resolve(item);
+          } else {
+            array.forEach((el) => {
+              console.log('findItem() foreEach iteration for el = ', el.id);
+              this.findItem(el.childrens, CII);
+            });
+          }
         } else {
-          array.forEach((el) => this.findItem(el.childrens, CII));
+          console.log('findItem() Пришел пустой массив');
+          return;
         }
-      }
-      return false;
+      });
     },
-    // getArrayForShow() {
-    //   if (this.currentItemId) {
-    //     let startArray = JSON.parse(JSON.stringify(this.arrayForShow));
-    //     this.arrayForShow = this.getChildArray(startArray, this.currentItemId);
-    //     return this.arrayForShow;
-    //   }
-    //   return this.arrayForShow;
-    // },
 
-    // addChild() {
-    //   if (this.currentItemId) {
-    //     this.startArray = [];
-    //     this.startArray.push(this.createChild());
-    //   }
-    //   this.startArray.push(this.createChild());
-    // },
+    addChild() {
+      if (this.currentItemId) {
+        //let item = this.findItem(this.startArray, this.currentItemId);
+        this.findItem(this.startArray, this.currentItemId).then((item) => {
+          console.log('addChild() find item before IF = ', item);
+        });
+        //console.log('addChild() find item before IF = ', item);
+        if (item) {
+          console.log('addChild() find item in IF = ', item);
+          item.childrens.push(this.createChild());
+        } else {
+          console.log('addChild() item не найден');
+        }
+      } else {
+        this.startArray.push(this.createChild());
+      }
+    },
 
     createChild() {
       return {
@@ -193,6 +184,13 @@ export default {
         title: `${this.currentLevel} level`,
         childrens: [],
       };
+    },
+
+    setCurrentItemId(CII) {
+      this.currentItemId = CII;
+      this.currentLevel++;
+      //this.startArray = this.arrayForShow;
+      //this.startArray = JSON.parse(JSON.stringify(this.arrayForShow));
     },
 
     // getChildArray(array, parentId) {
